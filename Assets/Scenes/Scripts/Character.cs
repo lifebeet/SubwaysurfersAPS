@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class Character : MonoBehaviour
 {
@@ -8,7 +9,10 @@ public class Character : MonoBehaviour
 private float jumpForce = 5f;
 [SerializeField]
 private float distanceToMove = 2f;
+[SerializeField]
+private float moveDuration = 0.2f;
  private bool isGrounded = true;
+ private bool isMoving = false;
  private void Start()
     {
         characterRigidbody = GetComponent <Rigidbody>();        
@@ -21,13 +25,32 @@ private float distanceToMove = 2f;
             isGrounded = false;
         }
     }
+    public void MoveDown()
+    {
+        if (!isGrounded)
+        {
+            characterRigidbody.AddForce(Vector3.down * jumpForce * 2, ForceMode.Impulse); 
+        }
+    }
     public void MoveLeft()
     {
-        transform.position += Vector3.left * distanceToMove;
+        Move(Vector3.left); 
     }
     public void MoveRight()
     {
-        transform.position += Vector3.right * distanceToMove;        
+        Move(Vector3.right);        
+    }
+    private void Move(Vector3 direction)
+    {
+        if (isMoving) return;
+
+        isMoving = true;
+        Vector3 targetPosition = transform.position + direction * distanceToMove;
+
+        transform.DOMove(targetPosition,moveDuration).SetEase(Ease.OutQuad).OnComplete(() =>
+        {
+            isMoving = false;
+        }); 
     }
     public  void OnCollisionEnter(Collision collision)
     {
