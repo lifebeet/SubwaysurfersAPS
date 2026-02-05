@@ -1,11 +1,15 @@
 using UnityEngine;
 using DG.Tweening;
+using System.Collections;
 
 public class Character : MonoBehaviour
 {
-    private Rigidbody characterRigidbody;
+private Rigidbody characterRigidbody;
     [ SerializeField]
-
+private CharacterData characterData;
+[SerializeField]
+private Animator characterAnimator;
+[SerializeField]
 private float jumpForce = 5f;
 [SerializeField]
 private float distanceToMove = 2f;
@@ -13,14 +17,17 @@ private float distanceToMove = 2f;
 private float moveDuration = 0.2f;
  private bool isGrounded = true;
  private bool isMoving = false;
+ private bool isRolling = false;
  private void Start()
     {
+        characterAnimator.Play(characterData.runAnimationName, 0, 0f);
         characterRigidbody = GetComponent <Rigidbody>();        
     }
     public void Jump()
     {
         if (isGrounded)
         {
+            characterAnimator.Play(characterData.jumpAnimationName, 0, 0f);
             characterRigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
         }
@@ -31,6 +38,9 @@ private float moveDuration = 0.2f;
         {
             characterRigidbody.AddForce(Vector3.down * jumpForce * 2, ForceMode.Impulse); 
         }
+        characterAnimator.Play(characterData.rollAnimationName, 0, 0f);
+        isRolling = true;
+        StartCoroutine(ResetRoll());
     }
     public void MoveLeft()
     {
@@ -52,12 +62,22 @@ private float moveDuration = 0.2f;
             isMoving = false;
         }); 
     }
+    private IEnumerator ResetRoll()
+    {
+        yield return new WaitForSeconds(characterAnimator.GetCurrentAnimatorStateInfo(0).length);
+    }
     public  void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
+            if (!isRolling)
+            {
+            characterAnimator.Play(characterData.runAnimationName, 0, 0f);
+            }
             isGrounded = true;
+        
         }
-    }
 
+    }
 }
+
