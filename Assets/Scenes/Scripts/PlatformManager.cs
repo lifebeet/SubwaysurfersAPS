@@ -15,10 +15,29 @@ public class PlatformManager : MonoBehaviour
      private void Start()
     {
         InstantiatePlatfotm(initialPlatforms);
-        transfotm.position = platformsPivot.position;
+        transform.position = platformsPivot.position;
     }
     public void InstantiatePlatfotm(int number)
     {
-        GameObject platformPrefab =platformPrefab
+        for (int i = 0; i < number; i++)
+        {
+                   GameObject platformPrefab =platformPrefabs[Random.Range(0,platformPrefabs.Length)];
+                   Vector3 spawnPosition = Vector3.zero;
+                   if (lastPlatform != null)
+            {
+                spawnPosition = lastPlatform.transform.position + lastPlatform.GetComponent<Collider>().bounds.size.z * Vector3.forward * 0.5f;    
+            }
+             GameObject newPlatform = Instantiate(platformPrefab, Vector3.zero, Quaternion.identity, transform);
+                newPlatform.transform.localPosition = spawnPosition + newPlatform.GetComponent<Collider>().bounds.size.z * Vector3.forward * 0.5f;
+                lastPlatform = newPlatform;
+            }
     }
+    private void Update()
+    {
+        if (isRunning)  
+        {
+            platformsPivot.Translate(Vector3.back * speed * Time.deltaTime);
+        }
+    }
+    
 }
