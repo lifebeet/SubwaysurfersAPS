@@ -1,11 +1,11 @@
-using UnityEngine;
+    using UnityEngine;
 
 public class PlatformManager : MonoBehaviour
 {
     [SerializeField]
     private Transform platformsPivot;
     [SerializeField]
-    private GameObject[]platformPrefabs;
+    private InstantiatePoolObjects[]platformPrefabs;
     [SerializeField]
      private int initialPlatforms = 5;
      [SerializeField]
@@ -21,13 +21,15 @@ public class PlatformManager : MonoBehaviour
     {
         for (int i = 0; i < number; i++)
         {
-                   GameObject platformPrefab =platformPrefabs[Random.Range(0,platformPrefabs.Length)];
+                  InstantiatePoolObjects instantiatePool =platformPrefabs[Random.Range(0,platformPrefabs.Length)];
                    Vector3 spawnPosition = Vector3.zero;
                    if (lastPlatform != null)
             {
                 spawnPosition = lastPlatform.transform.position + lastPlatform.GetComponent<Collider>().bounds.size.z * Vector3.forward * 0.5f;    
             }
-             GameObject newPlatform = Instantiate(platformPrefab, Vector3.zero, Quaternion.identity, transform);
+            instantiatePool.InstantiateObject(spawnPosition);
+             GameObject newPlatform = instantiatePool.GetCurrentObject();
+                newPlatform.transform.SetParent(transform);
                 newPlatform.transform.localPosition = spawnPosition + newPlatform.GetComponent<Collider>().bounds.size.z * Vector3.forward * 0.5f;
                 lastPlatform = newPlatform;
             }
@@ -36,8 +38,13 @@ public class PlatformManager : MonoBehaviour
     {
         if (isRunning)  
         {
-            platformsPivot.Translate(Vector3.back * speed * Time.deltaTime);
+            transform.Translate(Vector3.back * speed * Time.deltaTime);
         }
+    }
+    public void StopPlatforms()
+    {
+        isRunning= false;
+
     }
     
 }
