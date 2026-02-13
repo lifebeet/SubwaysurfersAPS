@@ -14,8 +14,19 @@ public class PlatformManager : MonoBehaviour
      private GameObject lastPlatform;
      private void Start()
     {
+        lastPlatform = null;
+        InitializePlatforms();
         InstantiatePlatfotm(initialPlatforms);
         transform.position = platformsPivot.position;
+        isRunning = true;
+        
+    }
+    private void  InitializePlatforms()
+    {
+        foreach (var platforms in platformPrefabs)
+        {
+            platforms.DeactivateAllObjects();
+        }
     }
     public void InstantiatePlatfotm(int number)
     {
@@ -25,7 +36,7 @@ public class PlatformManager : MonoBehaviour
                    Vector3 spawnPosition = Vector3.zero;
                    if (lastPlatform != null)
             {
-                spawnPosition = lastPlatform.transform.position + lastPlatform.GetComponent<Collider>().bounds.size.z * Vector3.forward * 0.5f;    
+                spawnPosition = lastPlatform.transform.localPosition + lastPlatform.GetComponent<Collider>().bounds.size.z * Vector3.forward * 0.5f;    
             }
             instantiatePool.InstantiateObject(spawnPosition);
              GameObject newPlatform = instantiatePool.GetCurrentObject();
