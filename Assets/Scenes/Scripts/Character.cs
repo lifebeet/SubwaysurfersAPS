@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 using System.Collections;
+using UnityEngine.Events;
 
 public class Character : MonoBehaviour
 {
@@ -15,6 +16,13 @@ private float jumpForce = 5f;
 private float distanceToMove = 2f;
 [SerializeField]
 private float moveDuration = 0.2f;
+private Transform characterStartPivot;
+[SerializeField]
+private UnityEvent onJump;
+[SerializeField]
+private UnityEvent onMoveToSide;
+[SerializeField]
+private UnityEvent onRoll;
  private bool isGrounded = true;
  private bool isMoving = false;
  private bool isRolling = false;
@@ -31,8 +39,10 @@ private float moveDuration = 0.2f;
     }
     public void Jump()
     {
+        if (!isActive)
         if (isGrounded)
         {
+            onJump?.Invoke();
             characterAnimator.Play(characterData.jumpAnimationName, 0, 0f);
             characterRigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
@@ -40,26 +50,31 @@ private float moveDuration = 0.2f;
     }
     public void MoveDown()
     {
+        if(!isActive || isRolling)return;
         if (!isGrounded)
         {
             characterRigidbody.AddForce(Vector3.down * jumpForce * 2, ForceMode.Impulse); 
         }
         characterAnimator.Play(characterData.rollAnimationName, 0, 0f);
+        onRoll?.Invoke();
         isRolling = true;
         StartCoroutine(ResetRoll());
     }
     public void MoveLeft()
     {
+        if(transform.position.x <= -distanceToMove)return;
         Move(Vector3.left); 
     }
     public void MoveRight()
     {
+        if (transform.position.x >= distanceToMove) return;
         Move(Vector3.right);        
     }
     private void Move(Vector3 direction)
     {
-        if (isMoving) return;
-
+        if (isMoving || !isActive) return;
+        onMoveToSide?.Invoke();
+        characterAnimator.Play(characterData.moveAnimationName, 0, 0f);
         isMoving = true;
         Vector3 targetPosition = transform.position + direction * distanceToMove;
 
