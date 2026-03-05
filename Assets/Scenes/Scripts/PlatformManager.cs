@@ -7,14 +7,18 @@ public class PlatformManager : MonoBehaviour
     [SerializeField]
     private InstantiatePoolObjects[]platformPrefabs;
     [SerializeField]
+    private  InstantiatePoolObjects[] securePlatformPrefabs;
+    [SerializeField]
      private int initialPlatforms = 5;
      [SerializeField]
      private float speed = 5f;
      private bool isRunning = true;
      private GameObject lastPlatform;
+     private int platformsInstantiated = 0;
      private void Start()
     {
         lastPlatform = null;
+        platformsInstantiated = 0;
         InitializePlatforms();
         InstantiatePlatfotm(initialPlatforms);
         transform.position = platformsPivot.position;
@@ -31,12 +35,20 @@ public class PlatformManager : MonoBehaviour
     public void InstantiatePlatfotm(int number)
     {
         for (int i = 0; i < number; i++)
-        {
-                  InstantiatePoolObjects instantiatePool =platformPrefabs[Random.Range(0,platformPrefabs.Length)];
-                   Vector3 spawnPosition = Vector3.zero;
-                   if (lastPlatform != null)
+        {InstantiatePoolObjects instantiatePool;
+                   if (platformsInstantiated < 2)
             {
-                spawnPosition = lastPlatform.transform.localPosition + lastPlatform.GetComponent<Collider>().bounds.size.z * Vector3.forward * 0.5f;    
+                instantiatePool = securePlatformPrefabs[Random.Range(0, securePlatformPrefabs.Length)];
+            }else
+            {
+                instantiatePool = platformPrefabs[Random.Range(0, platformPrefabs.Length)];
+            }
+            platformsInstantiated++;
+            Vector3 spawnPosition = Vector3.zero;
+            if (lastPlatform ! = null)
+            {
+                
+                spawnPosition  = lastPlatform.transform.localPosition + lastPlatform.GetComponent<Collider>().bounds.size.z * Vector3.forward * 0.5f;    
             }
             instantiatePool.InstantiateObject(spawnPosition);
              GameObject newPlatform = instantiatePool.GetCurrentObject();
