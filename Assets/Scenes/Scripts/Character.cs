@@ -85,7 +85,11 @@ private UnityEvent onRoll;
     }
     private IEnumerator ResetRoll()
     {
+        yield return null;
         yield return new WaitForSeconds(characterAnimator.GetCurrentAnimatorStateInfo(0).length);
+        isRolling = false;
+        normalCollider.enabled = true;
+        rollCollider.enabled = false;
     }
     public  void OnCollisionEnter(Collision collision)
     {
